@@ -70,19 +70,24 @@
  BoldFont={LiberationSerif-Bold.ttf}, 
  ItalicFont={LiberationSerif-Italic.ttf}]{LiberationSerif-Regular.ttf}
 
-\newcommand{\codesample}[1]{
-    ~\\	
-	%\begin{minipage}{\textwidth}
-	~\\
-    \begin{tcolorbox}[breakable,boxrule=0pt]
-        \begin{latin}
-            \large{
-                #1
-            }
-        \end{latin}
+ \newcommand{\codesample}[1]{
+	\LTR
+	\begin{latin}
+		\lstinputlisting{#1}
+	\end{latin}
+	\RTL
+}
+\newcommand{\smalltitle}[1] {
+	\noindent \textbf{#1}
+}
+\newcommand{\smallbox}[1]{
+	\begin{tcolorbox}[breakable,boxrule=0pt]
+    \begin{latin}
+        #1
+    \end{latin}
     \end{tcolorbox}
 	\vspace{0.2cm}
-	%\end{minipage}
+	\noindent
 }
 
 \newtcolorbox{mybox}[2][]{colback=red!5!white,
@@ -143,7 +148,7 @@ title=#2,#1}
 \renewcommand\cftsecfont{\color{sectionColor}\fehrestContent\selectfont}
 \renewcommand\cftsubsecfont{\color{subsectionColor}\fehrestContent\selectfont}
 \renewcommand\cftsubsubsecfont{\color{subsubsectionColor}\fehrestContent\selectfont}
-%\renewcommand{\cftsecpagefont}{\color{sectionColor}}
+\renewcommand{\cftsecpagefont}{\color{sectionColor}}
 
 \setlength{\parskip}{1.2pt}
 
