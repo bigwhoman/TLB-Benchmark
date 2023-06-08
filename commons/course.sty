@@ -1,0 +1,202 @@
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[svgnames]{xcolor} 
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage[many]{tcolorbox}
+\usepackage{listings }
+\usepackage[a4paper, total={6in, 8in}, top = 4cm, bottom = 4cm]{geometry}
+\usepackage{afterpage}
+\usepackage{amssymb}
+\usepackage{pdflscape}
+\usepackage{textcomp}
+\usepackage{xecolor}
+\usepackage{rotating}
+\usepackage[localise=on,extrafootnotefeatures]{xepersian}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usepackage{PTSerif} 
+\usepackage{seqsplit}
+\usepackage{changepage}
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{sectsty}
+
+\setcounter{secnumdepth}{0}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{blanchedalmond}{rgb}{1.0, 0.92, 0.8}
+\definecolor{brilliantlavender}{rgb}{0.96, 0.73, 1.0}
+ 
+\NewDocumentCommand{\codeword}{v}{
+\texttt{\textcolor{blue}{#1}}
+}
+\lstset{language=c,keywordstyle={\bfseries \color{blue}}}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\normalsize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\settextfont[Path=fonts/,BoldFont={XB Zar bold.ttf},ItalicFont={XB Zar italic.ttf}]{XB Zar.ttf}
+
+\newcommand{\link}[2]{\href{#1}{\textcolor{blue}{#2}}}
+
+\setlatintextfont[Path=fonts/,Scale=1.0,
+ BoldFont={LiberationSerif-Bold.ttf}, 
+ ItalicFont={LiberationSerif-Italic.ttf}]{LiberationSerif-Regular.ttf}
+
+\newcommand{\codesample}[1]{
+    ~\\	
+	%\begin{minipage}{\textwidth}
+	~\\
+    \begin{tcolorbox}[breakable,boxrule=0pt]
+        \begin{latin}
+            \large{
+                #1
+            }
+        \end{latin}
+    \end{tcolorbox}
+	\vspace{0.2cm}
+	%\end{minipage}
+}
+
+\newtcolorbox{mybox}[2][]{colback=red!5!white,
+colframe=red!75!black,fonttitle=\bfseries,
+colbacktitle=red!85!black,enhanced,
+attach boxed title to top center={yshift=-2mm},
+title=#2,#1}
+
+\newenvironment{changemargin}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item[]}{\end{list}}
+
+
+\definecolor{foldercolor}{RGB}{124,166,198}
+\definecolor{sectionColor}{HTML}{ff5e0e}
+\definecolor{subsectionColor}{HTML}{008575}
+
+\definecolor{listColor}{HTML}{00d3b9}
+
+\definecolor{umlrelcolor}{HTML}{3c78d8}
+
+\definecolor{subsubsectionColor}{HTML}{3c78d8}
+
+\defpersianfont\authorFont[Scale=0.9,Path=fonts/]{XB Zar bold.ttf}
+
+\defpersianfont\titr[Scale=1.5,Path=fonts/]{IRNazaninIrani.ttf}
+
+\defpersianfont\fehrest[Scale=1.2,Path=fonts/]{IRNazaninIrani.ttf}
+
+\defpersianfont\fehrestTitle[Scale=3.0,Path=fonts/]{IRNazaninIrani.ttf}
+
+\defpersianfont\fehrestContent[Scale=1.2,Path=fonts/]{XB Zar bold.ttf}
+
+
+\sectionfont{\color{sectionColor}}  % sets colour of sections
+\subsectionfont{\color{subsectionColor}}  % sets colour of sections
+\subsubsectionfont{\color{subsubsectionColor}}
+
+
+\renewcommand{\labelitemii}{$\circ$}
+
+
+\renewcommand{\baselinestretch}{1.1}
+
+
+\renewcommand{\contentsname}{فهرست}
+
+\renewcommand{\cfttoctitlefont}{\fehrestTitle}
+
+
+\renewcommand\cftsecfont{\color{sectionColor}\fehrestContent\selectfont}
+\renewcommand\cftsubsecfont{\color{subsectionColor}\fehrestContent\selectfont}
+\renewcommand\cftsubsubsecfont{\color{subsubsectionColor}\fehrestContent\selectfont}
+%\renewcommand{\cftsecpagefont}{\color{sectionColor}}
+
+\setlength{\parskip}{1.2pt}
+
+
+
+%------------intro---------------
+\newcommand{\heading}[0]{
+	\textbf{ \Huge{به نام خدا} }
+	
+	\vspace{0.2cm}
+	
+	\includegraphics[width=0.4\textwidth]{source/sharif.png}\\
+	\vspace{0.2cm}
+	\textbf{ \Huge{\emph درس سیستم‌عامل پیشرفته} }\\
+	\vspace{0.25cm}
+	\textbf{ \Large{پروژه درس} }
+	\vspace{0.2cm}
+	
+	
+	\large \textbf{دانشکده مهندسی کامپیوتر}\\\vspace{0.1cm}
+	\large   دانشگاه صنعتی شریف\\\vspace{0.2cm}
+	\large   ﻧﯿﻢ سال دوم 02-01 \\\vspace{0.10cm}
+	\noindent\rule[1ex]{\linewidth}{1pt}
+	استاد:\\
+	\textbf{{دکتر حسین اسدی}}
+	
+	\vspace{0.20cm}
+	
+	\vspace{0.10cm}
+	مسئول فاز:\\
+	\textbf{\authorFont{علی فرهانی}}
+	
+	\vspace{0.10cm}
+	نویسندگان:\\
+	\textbf{محمد هومان کشوری\\هیربد بهنام}
+}
+
+
+
+\newcommand{\pageheader}[0]{
+%%% header of pages
+	\pagestyle{fancy}
+	\fancyhf{}
+	\fancyfoot{}
+	\cfoot{\thepage}
+	\lhead{پروژه درس}
+	\rhead{%\includegraphics[width=0.1\textwidth]{source/sharif.png}\\
+		دانشکده مهندسی کامپیوتر
+	}
+	\chead{سیستم‌عامل پیشرفته}
+	%%% header of pages
+	\renewcommand{\headrulewidth}{2pt}
+	
+}
+
+
