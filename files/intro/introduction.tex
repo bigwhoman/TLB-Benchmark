@@ -75,7 +75,7 @@ TODO
 استفاده می‌کردیم.
 
 برای شروع در ابتدا به کمک دستور زیر برنامه‌های مورد نیاز را دانلود می‌کنیم:
-\smallbox{apt install build-essential dwarves python3 libncurses-dev flex bison libssl-dev bc libelf-dev zstd gnupg2 wget curl git}
+\codebox{apt install build-essential dwarves python3 libncurses-dev flex bison libssl-dev bc libelf-dev zstd gnupg2 wget curl git}
 سپس سورس‌کد‌های لینوکس را از سایت
 \link{https://kernel.org/}{kernel.org}
 دانلود می‌کنیم و از حالت فشرده خارج می‌کنیم.
@@ -84,7 +84,7 @@ TODO
 \lr{safe}
 بودن از خود کانفیگی که برای سیستم‌عامل فعلی است استفاده می‌کنیم. برای این کار صرفا از کامند زیر
 استفاده می‌کنیم:
-\smallbox{cp /boot/config-\$(uname -r) .config}
+\codebox{cp /boot/config-\$(uname -r) .config}
 این دستور کانفیگی که کرنل فعلی سیستم‌عامل با آن کامپایل شده است را به عنوان کانفیگی که ما می‌خواهیم
 کرنل با آن کامپایل شود قرار می‌دهد.
 
@@ -161,7 +161,7 @@ TODO
 کرنل نسخه‌ی 6 هم خیلی مشکلی نداشت صرفا با توجه به
 \link{https://techviewleo.com/install-linux-kernel-6-on-ubuntu/}{این}
 لینک باید دستور زیر را نیز اجرا می‌کردیم که کلید‌های امضا را غیر فعال کند:
-\smallbox{scripts/config --disable SYSTEM\_REVOCATION\_KEYS}
+\codebox{scripts/config --disable SYSTEM\_REVOCATION\_KEYS}
 
 \smalltitle{\lr{Host To VM}}
 \\\noindent
@@ -196,3 +196,24 @@ TODO
 کنیم. با این کار فایل اجرایی
 \lr{perf}
 در همان پوشه ساخته می‌شد.
+
+\smalltitle{\lr{Perf in VM}}
+\\\noindent
+یکی از مشکلاتی که می‌تواند به وجود آید این است در ماشین‌های مجازی
+\lr{perf}
+تمامی
+\lr{event}ها را
+\lr{<not supported>}
+نشان دهد. این موضوع به دلیل تنظیمات
+\lr{CPU KVM}
+است. برای درست شدن آن کافی است مانند 
+\link{https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_tuning_and_optimization_guide/sect-virtualization_tuning_optimization_guide-monitoring_tools-vpmu}{این}
+دستور العمل،‌ عمل کنیم. بدین منظور که دستور ادیت تنظیمات
+\lr{VM}
+را بزنیم و سپس خط مربوط به
+\lr{CPU}
+را به خط زیر تغییر دهیم:
+\codebox{<cpu mode='host-passthrough'/>}
+سپس با ری استارت کردن
+\lr{VM}
+مشکلات حل می‌شود.
