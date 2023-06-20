@@ -214,6 +214,7 @@ char *create_mock_database(uint32_t rows) {
     puts("Mocking orders");
     insert_orders(db, users_count, goods_count, orders_count);
     // Close the database and cleanup
+    printf("Created mock database %s\n", database_path);
     sqlite3_close(db);
     return database_path;
 }
