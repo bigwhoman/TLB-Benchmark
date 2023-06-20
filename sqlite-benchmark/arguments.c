@@ -23,7 +23,6 @@ void parse_arguments(int argc, char **argv, struct ParsedArguments *arguments) {
         exit(1);
     }
     // Log
-    printf("Running with %u readers, %u writers, %u mixed threads, %u tables and %u rows\n",
-           arguments->threads_reader, arguments->threads_writer, arguments->threads_mixed, arguments->table_rows,
-           arguments->table_rows);
+    printf("Running with %u readers, %u writers, %u mixed threads and %u rows\n",
+           arguments->threads_reader, arguments->threads_writer, arguments->threads_mixed, arguments->table_rows);
 }

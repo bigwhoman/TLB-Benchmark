@@ -12,5 +12,5 @@ int main(int argc, char **argv) {
     // Create the mock data
     const char *db_filename = create_mock_database(parsed_arguments.table_rows);
 
-    remove(db_filename); // cleanup
+    //remove(db_filename); // cleanup
 }
