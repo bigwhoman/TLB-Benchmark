@@ -205,6 +205,7 @@ char *create_mock_database(uint32_t rows) {
     }
     // Mock data
     const uint32_t users_count = rows, goods_count = rows / 10, orders_count = rows / 2;
+    sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, NULL);
     puts("Creating database");
     initialize_database(db);
     puts("Mocking users");
@@ -213,6 +214,8 @@ char *create_mock_database(uint32_t rows) {
     insert_goods(db, goods_count);
     puts("Mocking orders");
     insert_orders(db, users_count, goods_count, orders_count);
+    puts("Committing changes");
+    sqlite3_exec(db, "COMMIT;", NULL, NULL, NULL);
     // Close the database and cleanup
     printf("Created mock database %s\n", database_path);
     sqlite3_close(db);
