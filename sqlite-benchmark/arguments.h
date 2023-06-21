@@ -22,6 +22,10 @@ struct ParsedArguments {
      * Number of rows in table
      */
     uint32_t table_rows;
+    /**
+     * Test running time in seconds
+     */
+    uint32_t test_time;
 };
 
 /**

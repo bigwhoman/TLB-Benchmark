@@ -5,8 +5,6 @@
 #include "sqlite3.h"
 #include "util.h"
 
-#define MAX_DATABASE_PATH 32
-
 /**
  * Initialize database tables
  * @param db The database to init
@@ -192,9 +190,8 @@ static void insert_orders(sqlite3 *db, uint32_t users_count, uint32_t goods_coun
     sqlite3_finalize(stmt);
 }
 
-char *create_mock_database(uint32_t rows) {
+void create_mock_database(uint32_t rows, char *database_path) {
     // Create a temp file
-    char *database_path = malloc((MAX_DATABASE_PATH + 1) * sizeof(char));
     snprintf(database_path, MAX_DATABASE_PATH, "/tmp/db_bench%d", rand());
     // Create the database
     sqlite3 *db;
@@ -219,5 +216,4 @@ char *create_mock_database(uint32_t rows) {
     // Close the database and cleanup
     printf("Created mock database %s\n", database_path);
     sqlite3_close(db);
-    return database_path;
 }

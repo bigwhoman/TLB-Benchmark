@@ -5,6 +5,8 @@
 
 #include <stdbool.h>
 
+#define MAX_DATABASE_PATH 32
+
 struct TableUsers {
     int id;
     char first_name[16];
