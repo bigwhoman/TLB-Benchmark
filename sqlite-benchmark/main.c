@@ -15,6 +15,8 @@ int main(int argc, char **argv) {
     struct BenchmarkArguments benchmark_arguments;
     create_mock_database(parsed_arguments.table_rows, benchmark_arguments.database_path);
     benchmark_arguments.running_time = parsed_arguments.test_time;
+    benchmark_arguments.users_count = parsed_arguments.table_rows;
+    benchmark_arguments.goods_count = parsed_arguments.table_rows / 10;
     // Create threads and wait for them
     pthread_t threads[
             parsed_arguments.threads_reader + parsed_arguments.threads_writer + parsed_arguments.threads_mixed];
@@ -36,19 +38,20 @@ int main(int argc, char **argv) {
     struct BenchmarkResult *result;
     for (uint32_t i = 0; i < parsed_arguments.threads_reader; i++) {
         pthread_join(threads[i], (void **) &result);
-        printf("Reader thread %lu finished with %lu iterations.\n", threads[i], result->iterations);
+        printf("Reader thread %lu finished with %u iterations.\n", threads[i], result->reads);
         free(result);
     }
     for (uint32_t i = 0; i < parsed_arguments.threads_writer; i++) {
         pthread_join(threads[parsed_arguments.threads_reader + i], (void **) &result);
-        printf("Writer thread %lu finished with %lu iterations.\n", threads[parsed_arguments.threads_reader + i],
-               result->iterations);
+        printf("Writer thread %lu finished with %u iterations.\n", threads[parsed_arguments.threads_reader + i],
+               result->writes);
         free(result);
     }
     for (uint32_t i = 0; i < parsed_arguments.threads_mixed; i++) {
         pthread_join(threads[parsed_arguments.threads_reader + parsed_arguments.threads_writer + i], (void **) &result);
-        printf("Mixed thread %lu finished with %lu iterations.\n",
-               threads[parsed_arguments.threads_reader + parsed_arguments.threads_writer + i], result->iterations);
+        printf("Mixed thread %lu finished with %u reads and %u writes.\n",
+               threads[parsed_arguments.threads_reader + parsed_arguments.threads_writer + i],
+               result->reads, result->writes);
         free(result);
     }
     // Cleanup

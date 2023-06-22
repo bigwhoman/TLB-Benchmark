@@ -3,6 +3,8 @@
 
 #endif //SQLITE_BENCHMARK_UTIL_H
 
+#include <stdbool.h>
+
 /**
  * Generate a random number in range of [min, max)
  * @param min Min
@@ -29,3 +31,9 @@ double rand_double();
  * @param buffer The buffer to put the random data in. Must be 20 bytes long at least
  */
 void rand_date_time(char *buffer);
+
+/**
+ * Generates a random boolean
+ * @return The bool generated
+ */
+bool rand_bool();

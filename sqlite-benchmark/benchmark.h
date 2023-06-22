@@ -15,13 +15,19 @@ struct BenchmarkArguments {
      * How long should we keep running?
      */
     uint32_t running_time;
+    /**
+     * Number of rows of users
+     */
+    _Atomic uint32_t users_count;
+    /**
+     * Number of rows of goods
+     */
+    _Atomic uint32_t goods_count;
 };
 
 struct BenchmarkResult {
-    /**
-     * How many iterations (operations) has been done
-     */
-    uint64_t iterations;
+    uint32_t reads;
+    uint32_t writes;
 };
 
 /**

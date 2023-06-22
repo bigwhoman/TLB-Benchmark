@@ -24,7 +24,7 @@ static void initialize_database(sqlite3 *db) {
                                   "(\n"
                                   "    id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                                   "    name      TEXT    NOT NULL,\n"
-                                  "    price     TEXT    NOT NULL,\n"
+                                  "    price     INTEGER NOT NULL,\n"
                                   "    available BOOLEAN NOT NULL\n"
                                   ");\n"
                                   "CREATE INDEX idx_goods_available ON goods (available);\n"
@@ -43,12 +43,7 @@ static void initialize_database(sqlite3 *db) {
     }
 }
 
-/**
- * Insert some fake users into database
- * @param db The database to insert fake users
- * @param count The number of users to add
- */
-static void insert_users(sqlite3 *db, uint32_t count) {
+void insert_mock_users(sqlite3 *db, uint32_t count) {
     struct TableUsers user;
     sqlite3_stmt *stmt;
     int result;
@@ -96,12 +91,7 @@ static void insert_users(sqlite3 *db, uint32_t count) {
     sqlite3_finalize(stmt);
 }
 
-/**
- * Insert some fake goods into database
- * @param db The database to insert fake goods
- * @param count The number of goods to add
- */
-static void insert_goods(sqlite3 *db, uint32_t count) {
+void insert_mock_goods(sqlite3 *db, uint32_t count) {
     struct TableGoods goods;
     sqlite3_stmt *stmt;
     int result;
@@ -137,14 +127,7 @@ static void insert_goods(sqlite3 *db, uint32_t count) {
     sqlite3_finalize(stmt);
 }
 
-/**
- * Create fake orders for users
- * @param db The database to insert fake orders in
- * @param users_count Number of users (last id of users table)
- * @param goods_count Number of goods (last id of goods table)
- * @param orders_count Number of orders to mock
- */
-static void insert_orders(sqlite3 *db, uint32_t users_count, uint32_t goods_count, uint32_t orders_count) {
+void insert_mock_orders(sqlite3 *db, uint32_t users_count, uint32_t goods_count, uint32_t orders_count) {
     struct TableOrders order;
     sqlite3_stmt *stmt;
     int result;
@@ -206,11 +189,11 @@ void create_mock_database(uint32_t rows, char *database_path) {
     puts("Creating database");
     initialize_database(db);
     puts("Mocking users");
-    insert_users(db, users_count);
+    insert_mock_users(db, users_count);
     puts("Mocking goods");
-    insert_goods(db, goods_count);
+    insert_mock_goods(db, goods_count);
     puts("Mocking orders");
-    insert_orders(db, users_count, goods_count, orders_count);
+    insert_mock_orders(db, users_count, goods_count, orders_count);
     puts("Committing changes");
     sqlite3_exec(db, "COMMIT;", NULL, NULL, NULL);
     // Close the database and cleanup

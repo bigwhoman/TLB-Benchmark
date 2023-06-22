@@ -11,7 +11,7 @@ CREATE TABLE goods
 (
     id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name      TEXT    NOT NULL,
-    price     TEXT    NOT NULL,
+    price     INTEGER NOT NULL,
     available BOOLEAN NOT NULL
 );
 CREATE INDEX idx_goods_available ON goods (available);

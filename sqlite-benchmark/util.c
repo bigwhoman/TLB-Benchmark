@@ -26,3 +26,7 @@ void rand_date_time(char *buffer) {
              rand_range(1900, 2100), rand_range(1, 12 + 1), rand_range(1, 28),
              rand_range(1, 23), rand_range(0, 60), rand_range(0, 60));
 }
+
+bool rand_bool() {
+    return rand() % 2 == 0;
+}
