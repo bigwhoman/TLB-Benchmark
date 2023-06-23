@@ -4,13 +4,13 @@
 #endif //SQLITE_BENCHMARK_BENCHMARK_H
 
 #include <stdint.h>
-#include "database.h"
+#include "sqlite3.h"
 
 struct BenchmarkArguments {
     /**
-     * Path of database to do operations on it
+     * The open database connection
      */
-    char database_path[MAX_DATABASE_PATH];
+    sqlite3 *db;
     /**
      * How long should we keep running?
      */
@@ -29,6 +29,13 @@ struct BenchmarkResult {
     uint32_t reads;
     uint32_t writes;
 };
+
+/**
+ * Opens the database connection to be used for benchmarks
+ * @param path The path of database
+ * @return The opened database handler
+ */
+sqlite3 *benchmark_open_database(const char *path);
 
 /**
  * A writer thread to write data in database (only writes)

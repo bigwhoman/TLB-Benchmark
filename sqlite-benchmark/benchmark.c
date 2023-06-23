@@ -195,27 +195,28 @@ static void perform_database_write(sqlite3 *db, struct BenchmarkArguments *argum
     }
 }
 
+sqlite3 *benchmark_open_database(const char *path) {
+    sqlite3 *db;
+    int result_code = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, NULL);
+    if (result_code != SQLITE_OK) {
+        printf("cannot open database for benchmark: %s", sqlite3_errstr(result_code));
+        exit(1);
+    }
+    return db;
+}
+
 void *benchmark_reader(void *arguments_void) {
     // Parse arguments and prepare results from now
     struct timeval start_time;
     gettimeofday(&start_time, NULL);
     struct BenchmarkArguments *arguments = (struct BenchmarkArguments *) arguments_void;
     struct BenchmarkResult *result = calloc(1, sizeof(struct BenchmarkResult));
-    // Open database
-    sqlite3 *db;
-    int result_code = sqlite3_open_v2(arguments->database_path, &db, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, NULL);
-    if (result_code != SQLITE_OK) {
-        printf("cannot open database: %s", sqlite3_errstr(result_code));
-        exit(1);
-    }
-    sqlite3_exec(db, "PRAGMA busy_timeout = 10000;", NULL, NULL, NULL);
     // Main loop
     while (!deadline_reached(start_time, arguments->running_time)) {
-        perform_database_read(db, arguments->users_count, arguments->goods_count);
+        perform_database_read(arguments->db, arguments->users_count, arguments->goods_count);
         result->reads++;
     }
     // Done
-    sqlite3_close(db);
     return result;
 }
 
@@ -225,21 +226,12 @@ void *benchmark_writer(void *arguments_void) {
     gettimeofday(&start_time, NULL);
     struct BenchmarkArguments *arguments = (struct BenchmarkArguments *) arguments_void;
     struct BenchmarkResult *result = calloc(1, sizeof(struct BenchmarkResult));
-    // Open database
-    sqlite3 *db;
-    int result_code = sqlite3_open_v2(arguments->database_path, &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX, NULL);
-    if (result_code != SQLITE_OK) {
-        printf("cannot open database: %s", sqlite3_errstr(result_code));
-        exit(1);
-    }
-    sqlite3_exec(db, "PRAGMA busy_timeout = 10000;", NULL, NULL, NULL);
     // Main loop
     while (!deadline_reached(start_time, arguments->running_time)) {
-        perform_database_write(db, arguments);
+        perform_database_write(arguments->db, arguments);
         result->writes++;
     }
     // Done
-    sqlite3_close(db);
     return result;
 }
 
@@ -249,26 +241,17 @@ void *benchmark_mixed(void *arguments_void) {
     gettimeofday(&start_time, NULL);
     struct BenchmarkArguments *arguments = (struct BenchmarkArguments *) arguments_void;
     struct BenchmarkResult *result = calloc(1, sizeof(struct BenchmarkResult));
-    // Open database
-    sqlite3 *db;
-    int result_code = sqlite3_open_v2(arguments->database_path, &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX, NULL);
-    if (result_code != SQLITE_OK) {
-        printf("cannot open database: %s", sqlite3_errstr(result_code));
-        exit(1);
-    }
-    sqlite3_exec(db, "PRAGMA busy_timeout = 10000;", NULL, NULL, NULL);
     // Main loop
     while (!deadline_reached(start_time, arguments->running_time)) {
         // Do either a read or write with 50% chance
         if (rand_bool()) {
-            perform_database_write(db, arguments);
+            perform_database_write(arguments->db, arguments);
             result->writes++;
         } else {
-            perform_database_read(db, arguments->users_count, arguments->goods_count);
+            perform_database_read(arguments->db, arguments->users_count, arguments->goods_count);
             result->reads++;
         }
     }
     // Done
-    sqlite3_close(db);
     return result;
 }

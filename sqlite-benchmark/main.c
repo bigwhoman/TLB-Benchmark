@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include "arguments.h"
 #include "benchmark.h"
+#include "database.h"
 #include "mocker.h"
 
 int main(int argc, char **argv) {
@@ -13,11 +14,14 @@ int main(int argc, char **argv) {
     parse_arguments(argc, argv, &parsed_arguments);
     // Create the mock data
     struct BenchmarkArguments benchmark_arguments;
-    create_mock_database(parsed_arguments.table_rows, benchmark_arguments.database_path);
+    char database_path[MAX_DATABASE_PATH];
+    create_mock_database(parsed_arguments.table_rows, database_path);
+    benchmark_arguments.db = benchmark_open_database(database_path);
     benchmark_arguments.running_time = parsed_arguments.test_time;
     benchmark_arguments.users_count = parsed_arguments.table_rows;
     benchmark_arguments.goods_count = parsed_arguments.table_rows / 10;
     // Create threads and wait for them
+    puts("Starting benchmark...");
     pthread_t threads[
             parsed_arguments.threads_reader + parsed_arguments.threads_writer + parsed_arguments.threads_mixed];
     /**
@@ -55,5 +59,6 @@ int main(int argc, char **argv) {
         free(result);
     }
     // Cleanup
-    remove(benchmark_arguments.database_path);
+    sqlite3_close(benchmark_arguments.db);
+    remove(database_path);
 }
