@@ -1,0 +1,4 @@
+\codebox{
+    perf record -p \$(pidof sqlite_benchmark | tr ' ' ',') -o sqlite-bare-metal-5.perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults\\
+    strace -f -p "\$(pidof sqlite_benchmark)" 2> sqlite-bare-metal-5.strace
+}

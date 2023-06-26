@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "arguments.h"
 #include "benchmark.h"
 #include "database.h"
@@ -20,6 +21,10 @@ int main(int argc, char **argv) {
     benchmark_arguments.running_time = parsed_arguments.test_time;
     benchmark_arguments.users_count = parsed_arguments.table_rows;
     benchmark_arguments.goods_count = parsed_arguments.table_rows / 10;
+    // Wait for user
+    printf("Program's PID is %d\n", getpid());
+    puts("Press enter to start the benchmark...");
+    getchar();
     // Create threads and wait for them
     puts("Starting benchmark...");
     pthread_t threads[

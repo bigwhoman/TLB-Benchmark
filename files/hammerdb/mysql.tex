@@ -1,0 +1,4 @@
+\codebox{
+    perf record -p \$(pidof mysqld | tr ' ' ',') -o hammerdb-schema-build-bare-metal-5.perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults\\
+    strace -f -p "\$(pidof mysqld)" 2> hammerdb-schema-build-bare-metal-5.strace
+}
