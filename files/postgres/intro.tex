@@ -1,4 +1,15 @@
 \subsection{مقدمه}
+\subsubsection{نصب PostgreSQL}
+برای نصب
+\lr{PostgreSQL}
+ما از
+\lr{repo} خود \lr{PostgreSQL}
+به کمک راهنمایی‌های
+\link{https://www.postgresql.org/download/linux/ubuntu/}{این لینک}
+استفاده کردیم. با این کار نسخه‌ی
+\lr{15.3}
+را نصب کردیم. این کار را برای ماشین مجازی و حقیقی انجام دادیم.
+\subsubsection{تنظیم HammerDB}
 برای تست برنامه‌های
 \lr{MySQL} و \lr{PostgreSQL}
 ما تصمیم گرفتیم که از برنامه‌ی
@@ -83,7 +94,15 @@ C
 \lr{side note}
 نیز باید ذکر کنم که
 \lr{autopilot}
-چندین تست با چندین تعداد فعال همزمان بر روی دیتابس می‌گیرد.
+چندین تست با چندین تعداد فعال همزمان بر روی دیتابیس می‌گیرد.
+
+گرچه
+\lr{autopilot}
+برای یک تست کوچک خوب است، برای تست‌های واقعی ما از  قسمت
+\lr{Virtual Users}، \lr{Create} و سپس \lr{run}
+را انتخاب می‌کنیم که مقدار
+\lr{TPM}
+را نیز داشته باشیم.
 
 \begin{figure}[H]
     \centering
@@ -94,3 +113,22 @@ C
 در نهایت زمانی که کارمان تمام شد نیز بر روی
 \lr{delete schema}
 کلیک می‌کنیم که دیتابیس پاک شود.
+
+\subsubsection{تنظیم PostgreSQL در VM}
+در ابتدا نیاز است که مانند ماشین
+\lr{bare metal}، از خود ریپوهای \lr{PostgreSQL}
+برنامه را نصب کنیم. سپس بعد از نصب باید تنظیماتی انجام دهیم که ماشین
+\lr{bare metal}
+بتواند به ماشین مجازی درخواست بزند و به دیتابیس آن وصل شود. به صورت پیش‌فرض فقط درخواست‌های
+\lr{localhost}
+به دیتابیس قبول می‌شوند. برای این کار در ابتدا فایل
+\codeword{/etc/postgresql/15/main/postgresql.conf}
+را باز می‌کنیم و خط زیر را به آن اضافه می‌کنیم:
+\codebox{listen\_addresses = '*'}
+سپس فایل
+\codeword{/etc/postgresql/15/main/pg_hba.conf}
+را باز می‌کنیم و خط زیر را به آن اضافه می‌کنیم:
+\codebox{host    all             all             0.0.0.0/0            md5}
+سپس به کمک
+\codeword{systemctl restart postgresql}
+دیتابیس را ری استارت می‌کنیم. سپس به صورت معمول یک یوزر جدید را به دیتابیس اضافه می‌کنیم.
