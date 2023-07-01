@@ -51,7 +51,11 @@
 \smalltitle{هومان:}
 \begin{latin}
 \begin{itemize}
-	\item TODO
+	\item Intel® Core™ i7-10750H Processor
+	\item 12GB DDR4 RAM
+	\item OS installed on HDD. 150 GB space.
+	\item GTX 1650 Ti
+	\item KVM virtualization enabled
 \end{itemize}
 \end{latin}
 
@@ -155,7 +159,14 @@ TODO
 \smalltitle{\lr{4.19.284}}
 \\\noindent
 این نسخه خیلی چالش خاصی نداشت و صرفا توانستیم آنرا با زدن دستورات بالا نصب کرد.
-
+\\
+\textbf{آپدیت}
+\\
+در این کرنل به یک مشکل همانند کرنل ۶.۳.۶ برخوردیم که خوب مشکل زیر بود 
+\codebox{cannot stat 'arch/x86/crypto/aegis128-aesni.ko'}
+احتمالا به دلیل مشکلات کلید کرنل است که با زدن دستور زیر درست شد.
+\codebox{sed -ri '/CONFIG\_SYSTEM\_TRUSTED\_KEYS/s/=.+/=""/g' .config}
+\\
 \smalltitle{\lr{6.3.6}}
 \\\noindent
 کرنل نسخه‌ی 6 هم خیلی مشکلی نداشت صرفا با توجه به
