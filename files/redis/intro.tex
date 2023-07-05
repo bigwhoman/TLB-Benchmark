@@ -16,15 +16,16 @@ containrize
 داکیومنتیشن نصب می‌کنیم و سپس 
 برای نصب ردیس، از قطعه کد زیر استفاده می‌کنیم که 
 ردیس را نصب می‌کند و پورت ۶۳۷۹ آنرا، به پورت ۶۳۷۹ کامپیوتر بایند می‌کند.
-\codebox{
-    TODO\\\\
-version: '3.7'\\
-services:\\
-  redis:\\
-    image: redis\\
-    ports:\\
-      - 6379:6379
-}
+\begin{latin}
+  \begin{verbatim}
+    version: '3.7'
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379    
+  \end{verbatim}
+\end{latin}
 برای بنچ‌مارک ردیس از ابزار درونی خود ردیس استفاده می‌کنیم که همان 
 \textbf{redis-benchmark}
 است.

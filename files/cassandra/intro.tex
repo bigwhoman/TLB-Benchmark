@@ -1,46 +1,101 @@
+
 \subsection{مقدمه}
 \subsubsection{نصب Cassandra}
-برای نصب 
-redis 
-در این قسمت از داکر
-استفاده می‌کنیم.
-می‌دانیم که داکر 
-عملا فقط عملیات 
-containrize 
-کردن را انجام
-می‌دهد
-پس  در کلیت تست ما 
-تاثیری ندارد.
-\\
-ابتدا داکر و داکر کامپوز را مطابق مراحل نصب گفته شده در
-داکیومنتیشن نصب می‌کنیم و سپس 
-برای نصب ردیس، از قطعه کد زیر استفاده می‌کنیم که 
-ردیس را نصب می‌کند و پورت ۶۳۷۹ آنرا، به پورت ۶۳۷۹ کامپیوتر بایند می‌کند.
-\codebox{
-    TODO\\\\
-version: '3.7'\\
-services:\\
-  redis:\\
-    image: redis\\
-    ports:\\
-      - 6379:6379
-}
-برای بنچ‌مارک ردیس از ابزار درونی خود ردیس استفاده می‌کنیم که همان 
-\textbf{redis-benchmark}
-است.
-\\
-این ابزار در چندین سناریوی ازپیش‌ تعریف‌‌شده دیتابیس گفته‌شده را تست می‌کند و همچنین می‌توان تعداد کاربران و نیز
-تراکنش‌های موازی آنرا تعیین کرد.
-\\
-برای تست کردن و جمع‌آوری دیتا از اسکریپت زیر استفاده می‌کنیم.
-\begin{latin}
-  \codebox{
-  sudo perf record -o ./benchmark/redis-benchmark-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults redis-benchmark
-  \\
-  strace redis-benchmark 2> ./benchmark/redis-benchmark-bare-metal-\$(uname -r).strace 
-}
-\end{latin}
-\noindent
-برای اینکه بدانیم هر تست برای کدام ورژن کرنل است در انتهای نام تست، نام کرنل را هم می‌گذاریم تا بعدا برای 
-مقایسه آنها فرایند ساده‌تری داشته باشیم.
+کاساندرا یک دیتابیس توزیع‌شده nosql است.\\
+برای نصب و استفاده از آن از داکر کمک می‌گیریم.
+ابتدا برای راه‌اندازی باید فایل 
+docker compose 
+زیر را راه‌اندازی کنیم. می‌دانیم در صورتی که 
+image  
+خواسته شده، موجود نباشد، خود داکر کامپوز آنرا
+pull 
+می‌کند.\\
+دلیل استفاده از داکر این بود که می‌توانستیم نحوه کارکرد 
+seed 
+های 
+cassandra 
+را در بین 
+node 
+های دنیای واقعی که همان کامپیوترهای مختلف هستند بررسی کنیم.
 
+
+\begin{latin}
+  \begin{verbatim}
+    version: '3'
+    services:
+      cassandra_node_template:
+        image: cassandra
+        environment:
+          - CASSANDRA_CLUSTER_NAME=my_cluster
+          - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+        networks:
+          - cassandra_net
+    networks:
+      cassandra_net:
+        driver: bridge
+  \end{verbatim}
+\end{latin}
+
+حال این ایمیج برای ساختن یک عدد 
+container 
+استفاده می‌شود.
+\\
+برای ساخت کلیه موارد مورد نظر، از اسکریپت create\_nodes استفاده می‌کنیم که عملا تعداد seed های مورد نظر را 
+گرفته و به تعداد آنان، کانتینر حاوی 
+cassandra 
+ایجاد کرده، 
+این کانتینرها را به هم متصل می‌کند و یک 
+cluster 
+تشکیل می‌دهد و درنهایت 
+صبر می‌کند تا آنها بالا بیایند و از صحت آنان مطلع می‌شود.
+\\
+\textbf{نکته مهم : } 
+به علت عدم وجود حافظه کافی و اینکه هر کدام از 
+seed 
+های کاساندرا مقدار زیادی منبع مصرف می‌کنند، نتوانستم بیش از ۳ 
+node 
+همزمان را بالا بیاورم پس مجبور شدم برای جلوگیری از کاهش عملکرد، صرفا به ۲ seed 
+اکتفا کنم.
+\\
+حال پس از بالا آمدن node 
+ها باید آنها را بنچ‌مارک کنیم که برای این کار از خود ابزار 
+\textbf{cassandra-stress}
+موجود در tools 
+همراه برنامه استفاده می‌کنیم.
+\\
+متاسفانه این برنامه در کانتینرها و کلا docker image 
+خود کاساندرا موجود نبود و مجبور شدم به صورت جداگانه کاساندرا را در کامپیوتر نصب کنم تا بتوانم از این ابزار استفاده کنم.\\
+حال از اسکریپت benchmark.sh 
+برای بنچ‌مارک با کمک کاساندرا استفاده می‌کنیم.
+برای این کار اسکریپت زیر را درنظر بگیرید.
+\codebox{
+
+sudo perf record -o ./benchmark/cassandra-benchmark-3-7-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50
+\\
+strace cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50 2> ./benchmark/cassandra-benchmark-3-7-bare-metal-\$(uname -r).strace 
+\\
+
+sudo perf record -o ./benchmark/cassandra-benchmark-5-5-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50
+\\
+strace cassandra-stress mixed ratio(write=5,read=5) n=1000000 -rate threads=50 2> ./benchmark/cassandra-benchmark-5-5-bare-metal-\$(uname -r).strace 
+\\
+
+sudo perf record -o ./benchmark/cassandra-benchmark-7-3-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50
+\\
+strace cassandra-stress mixed ratio(write=7,read=3) n=1000000 -rate threads=50 2> ./benchmark/cassandra-benchmark-7-3-bare-metal-\$(uname -r).strace 
+}
+این اسکریپت عملا در ۳ سناریو، یک میلیون تا عملیات را برروی 
+seed 
+های کاساندرا انجام می‌دهد.
+\\
+گزینه mixed مشخص می‌کند که این 
+نسبت خواندن و نوشتن‌ها به چه اندازه باشد و نیز 
+تعداد عملیات‌های موازی با 
+threads 
+مشخص شده است.
+\\
+این ۳ سناریو محبوب‌ترین سناریوهایی بودند که طبق گفته خود 
+کامیونیتی کاساندرا 
+غالبا در سیستم‌های توزیع‌شده استفاده می‌شوند.
+\\
+حال نتایج را در سیستم‌های مختلف بررسی می‌کنیم.
