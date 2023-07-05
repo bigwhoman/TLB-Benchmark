@@ -1,4 +1,16 @@
 \subsection{Metal Bare}
+برای حالت
+\lr{bare metal}
+ما با این تنظیمات برنامه را تست کردیم:
+\begin{itemize}
+    \item ۲ ترد نویسنده
+    \item ۲ ترد خواننده
+    \item ۲ ترد \lr{mixed}
+    \item ده میلیون \lr{row} که دو گیگ فایل دیتابیس می‌سازد.
+    \item ۱۰ دقیقه زمان تست
+\end{itemize}
+به کمک دستورات زیر نیز دیتای مورد نیاز را برای برنامه جمع می‌کنیم. البته دقت کنید که این دستورات
+را بعد از ساخت دیتای ماک دیتابیس زدیم.
 \codebox{
     perf record -p \$(pidof sqlite\_benchmark | tr ' ' ',') -o sqlite-bare-metal-5.perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults\\
     strace -f -p "\$(pidof sqlite\_benchmark)" 2> sqlite-bare-metal-5.strace
