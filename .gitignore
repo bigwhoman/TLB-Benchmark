@@ -11,3 +11,5 @@ HW.synctex.gz
 cmake-build-debug
 .ipynb_checkpoints
 __pycache__
+*.perf
+*.strace
