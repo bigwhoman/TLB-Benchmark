@@ -14,7 +14,7 @@ do
 cat >> cockroach-compose.yml <<EOF
   roach$i:
     image: cockroachdb/cockroach
-    command: start --advertise-addr=roach$i:26357 --http-addr=roach$i:$((8080+$i-1)) --listen-addr=roach$i:26357 --sql-addr=roach$i:$((26256+$i)) --insecure --join=$(for j in $(seq 1 $num_nodes); do echo -n "roach$j:26357,"; done | sed 's/,$//')
+    command: start --advertise-addr=roach$i:26357 --http-addr=roach$i:$((8080+$i-1)) --listen-addr=roach$i:26357 --sql-addr=roach$i:$((26256+$i)) --store=tpcc-local$i --insecure --join=$(for j in $(seq 1 $num_nodes); do echo -n "roach$j:26357,"; done | sed 's/,$//')
     hostname: roach$i
     ports:
       - "$((26256+$i)):$((26256+$i))"

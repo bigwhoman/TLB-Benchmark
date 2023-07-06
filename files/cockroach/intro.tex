@@ -1,46 +1,96 @@
 \subsection{مقدمه}
 \subsubsection{نصب Cockroach}
-برای نصب 
-redis 
-در این قسمت از داکر
-استفاده می‌کنیم.
-می‌دانیم که داکر 
-عملا فقط عملیات 
-containrize 
-کردن را انجام
-می‌دهد
-پس  در کلیت تست ما 
-تاثیری ندارد.
+برای استفاده از CockroachDB 
+مانند قسمت‌های قبلی، از داکر و داکرکامپوز
+استفاده می‌کنیم به این صورت که ابتدا از اسکریپت
+create\_cockroach\_nodes
+برای ساخت تعداد دلخواه node 
+استفاده می‌کنیم که این اسکریپت آنها را در یک شبکه قرار می‌دهد و نیز آنها را به یکدیگر متصل می‌کند.
 \\
-ابتدا داکر و داکر کامپوز را مطابق مراحل نصب گفته شده در
-داکیومنتیشن نصب می‌کنیم و سپس 
-برای نصب ردیس، از قطعه کد زیر استفاده می‌کنیم که 
-ردیس را نصب می‌کند و پورت ۶۳۷۹ آنرا، به پورت ۶۳۷۹ کامپیوتر بایند می‌کند.
-\codebox{
-    TODO\\\\
-version: '3.7'\\
-services:\\
-  redis:\\
-    image: redis\\
-    ports:\\
-      - 6379:6379
-}
-برای بنچ‌مارک ردیس از ابزار درونی خود ردیس استفاده می‌کنیم که همان 
-\textbf{redis-benchmark}
-است.
-\\
-این ابزار در چندین سناریوی ازپیش‌ تعریف‌‌شده دیتابیس گفته‌شده را تست می‌کند و همچنین می‌توان تعداد کاربران و نیز
-تراکنش‌های موازی آنرا تعیین کرد.
-\\
-برای تست کردن و جمع‌آوری دیتا از اسکریپت زیر استفاده می‌کنیم.
+حال یک نمونه از فایل داکر ساخته شده برای 3 عدد node را می‌توان مشاهده کرد :
 \begin{latin}
-  \codebox{
-  sudo perf record -o ./benchmark/redis-benchmark-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults redis-benchmark
-  \\
-  strace redis-benchmark 2> ./benchmark/redis-benchmark-bare-metal-\$(uname -r).strace 
-}
-\end{latin}
-\noindent
-برای اینکه بدانیم هر تست برای کدام ورژن کرنل است در انتهای نام تست، نام کرنل را هم می‌گذاریم تا بعدا برای 
-مقایسه آنها فرایند ساده‌تری داشته باشیم.
+  \begin{verbatim}
+    version: '3'
+    services:
+      roach1:
+        image: cockroachdb/cockroach
+        command: start --advertise-addr=roach1:26357 
+                  --http-addr=roach1:8080 --listen-addr=roach1:26357 
+                  --store=tpcc-local1 --sql-addr=roach1:26257 
+                  --insecure --join=roach1:26357,roach2:26357,roach3:26357
+        hostname: roach1
+        ports:
+          - "26257:26257"
+          - "8080:8080"
+        volumes:
+          - ./cockroach-data/roach1:/cockroach/cockroach-data
+        networks:
+          - crdb_network
+      roach2:
+        image: cockroachdb/cockroach
+        command: start --advertise-addr=roach2:26357
+                    --http-addr=roach2:8081 --listen-addr=roach2:26357
+                    --store=tpcc-local2 --sql-addr=roach2:26258
+                    --insecure --join=roach1:26357,roach2:26357,roach3:26357
+        hostname: roach2
+        ports:
+          - "26258:26258"
+          - "8081:8081"
+        volumes:
+          - ./cockroach-data/roach2:/cockroach/cockroach-data
+        networks:
+          - crdb_network
+      roach3:
+        image: cockroachdb/cockroach
+        command: start --advertise-addr=roach3:26357
+                    --http-addr=roach3:8082 --listen-addr=roach3:26357
+                    --store=tpcc-local2 --sql-addr=roach3:26259
+                    --insecure --join=roach1:26357,roach2:26357,roach3:26357
+        hostname: roach3
+        ports:
+          - "26259:26259"
+          - "8082:8082"
+        volumes:
+          - ./cockroach-data/roach3:/cockroach/cockroach-data
+        networks:
+          - crdb_network
+    networks:
+      crdb_network:
+        driver: bridge
 
+  \end{verbatim}
+\end{latin}
+
+حال پس از راه‌اندازی node ها اسکریپت benchmark.sh را ران می‌کنیم که 
+تست TPC-C 
+را اجرا می‌کند.
+این تست یکی از معتبرترین و واقعی‌ترین تست‌های دیتابیس‌های توریع‌شده است که 
+یک فروشگاه آنلاین را به همراه تعداد انبار داده شده مثلا آمازون و تراکنش‌های آن، شبیه‌سازی می‌کند.
+برای اطلاع بیشتر از این تست بسیار جالب به 
+\link{https://www.tpc.org/tpc_documents_current_versions/pdf/tpc-c_v5.11.0.pdf}{این لینک}
+مراجعه کنید.
+\\
+طبق عکس زیر مشاهده می‌کنیم که برای تست به صورت لوکال باید از ۳ 
+node استفاده کنیم.
+\\
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{pictures/cockroach/init/tpcc2.png}
+  \caption{تنظیمات \lr{benchmark}}
+\end{figure}
+حال برای انجام این تست ابتدا باید در یکی از node 
+های کلاستر، داده‌های تست را لود کنیم و دیتابیس را بسازیم.
+\\
+\codebox{
+  docker exec -it cockroach\_roach1\_1 ./cockroach workload fixtures import tpcc --warehouses=10 'postgresql://root@roach1:26257?sslmode=disable'
+}
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.25]{pictures/cockroach/init/init-tpcc2.png}
+  \caption{نتیجه import داده}
+\end{figure}
+سپس تست را با دستور زیر شروع می‌کنیم.
+این تست به مدت ۱۰ دقیقه اجرا می‌شود.
+\codebox{
+  perf record -o ./benchmark/cockroach-benchmark-tpcc-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults docker exec -it cockroach\_roach1\_1 cockroach workload run tpcc --warehouses=10 --ramp=3m --duration=10m 'postgresql://root@roach1:26257?sslmode=disable'
+}
