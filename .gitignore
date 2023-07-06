@@ -13,3 +13,4 @@ cmake-build-debug
 __pycache__
 *.perf
 *.strace
+cockroach-data
