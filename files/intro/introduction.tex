@@ -60,7 +60,28 @@
 \end{latin}
 
 \subsection{محیط‌ virtual}
-TODO
+\smalltitle{نصب}\\
+برای محیط مجازی ما تصمیم به استفاده از
+\lr{KVM}
+گرفتیم. برای راه‌اندازی آن در ابتدا باید پکیج‌های مورد نیاز از
+\lr{apt}
+را به کمک دستور زیر نصب کنیم:
+\codebox{apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager}
+سپس به کمک دستورات زیر باید به کاربر جاری اجازه دهیم که از
+\lr{KVM}
+بتواند استفاده بکند.
+\codebox{sudo adduser 'hirbod' libvirt\\sudo adduser 'hirbod' kvm}
+سپس به کمک دستور
+\codeword{systemctl status libvirtd}
+می‌توان چک کرد که آیا
+\lr{KVM}
+فعال است یا خیر.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{pictures/intro/kvm.png}
+    \caption{\lr{KVM service}}
+    \label{fig:into:kvm}
+\end{figure}
 
 \subsection{کامپایل کرنل}
 در این آزمایش ما تصمیم گرفتیم که کرنل‌های
@@ -156,6 +177,26 @@ TODO
 \lr{dockerd}
 دیگر استارت نمی‌شد. پس نمی‌توانستیم دیتابیس‌ها از داکر نصب کنیم بر روی این نسخه‌ی کرنل\dots
 
+اما مشکل اصلی این نسخه‌ی کرنل بر روی ماشین مجازی بود. زمانی که این کرنل را برای ماشین مجازی کامپایل
+و نصب کردیم، دیگر نمی‌توانستیم آنرا
+\lr{boot}
+کنیم. با توجه به لاگ‌هایی که وجود داشت،‌ سیستم‌عامل نمی‌توانست پارتیشن‌های دیسک اصلی را بشناسد برای همین در
+حالت
+\lr{recovery mode}
+می‌رفت مانند شکل
+\ref{fig:into:kernel:vm3}.
+ما کار‌هایی زیادی مثل عوض کردن
+\lr{fdisk}،‌
+غیر فعال کردن
+\lr{virtio} و
+چک کردن اینکه آیا این ماژول فعال است انجام دادیم ولی با این حال نتوانستیم آنرا بوت کنیم.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{pictures/intro/kvm-kernel-3.png}
+    \caption{بوت نشدن ماشین مجازی در کرنل نسخه‌ی 3}
+    \label{fig:into:kernel:vm3}
+\end{figure}
+
 \smalltitle{\lr{4.19.284}}
 \\\noindent
 این نسخه خیلی چالش خاصی نداشت و صرفا توانستیم آنرا با زدن دستورات بالا نصب کرد.
@@ -228,3 +269,56 @@ TODO
 سپس با ری استارت کردن
 \lr{VM}
 مشکلات حل می‌شود.
+
+\subsection{Pages Huge}
+با توجه به تحقیقاتی که ما انجام دادیم،
+\lr{huge pages}ها
+نیازی نیست که در زمان کامپایل ورژن لینوکس ست شوند. بلکه کافی است که در
+\codeword{/etc/sysctl.conf}
+تنظیماتی را انجام دهیم. برای شروع دستور زیر را وارد می‌کنیم:
+\codebox{\$ grep $\string^$Huge /proc/meminfo\\
+HugePages\_Total:       0\\
+HugePages\_Free:        0\\
+HugePages\_Rsvd:        0\\
+HugePages\_Surp:        0\\
+Hugepagesize:       2048 kB\\
+Hugetlb:               0 kB}
+همان طور که مشاهده می‌شود
+\lr{CPU}
+ما از
+\lr{huge pages}
+پشتیبانی می‌کند و مقدار دیفالت آن صفحات دو مگابایتی است. برای فعال سازی
+\lr{huge pages}
+کافی است که خط زیر را به
+\codeword{/etc/sysctl.conf}
+اضافه کنیم:
+\codebox{vm.nr\_hugepages = 200}
+به عنوان مثال در اینجا ۲۰۰ صفحه ۲ مگابایتی را
+\lr{allocate}
+می‌کنیم. دقت کنید که این صفحات حالت 
+\lr{demanding}
+ندارند که تعداد آنها بتواند کم یا زیاد شود. بلکه باید از زمان
+\lr{boot}
+سیستم‌عامل تعداد آنها مشخص شده باشد و سیستم عامل دقیقا به همان اندازه صفحه درست می‌کند.
+بعد از ست کردن این عدد سیستم را ری استارت می‌کنیم. من برای تست‌ها ۵۰۰ عدد یعنی برابر ۱ گیگابایت
+را در نظر گرفتم.
+
+بعد از ری‌استارت سیستم در صورتی که دوباره دستور فرق را بزنیم خروجی به صورت زیر است:
+\codebox{\$ grep $\string^$Huge /proc/meminfo\\
+HugePages\_Total:     500\\
+HugePages\_Free:      500\\
+HugePages\_Rsvd:        0\\
+HugePages\_Surp:        0\\
+Hugepagesize:       2048 kB\\
+Hugetlb:         1024000 kB}
+همان طور که مشخص است حال در حال استفاده از
+\lr{huge pages}
+هستیم. جالب است که اگر
+\lr{htop}
+را نیز نگاه کنیم می‌بینیم که حدودا یک گیگ بیشتر از حالت معمولی مموری در حال مصرف شدن است.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{pictures/intro/hugepages-htop.png}
+    \caption{\lr{htop} بعد از فعال کردن \lr{huge pages}}
+    \label{fig:into:hugepages:htop}
+\end{figure}
