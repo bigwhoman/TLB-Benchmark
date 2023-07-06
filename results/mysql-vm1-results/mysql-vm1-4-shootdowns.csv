@@ -1,0 +1,4 @@
+reason,occurrence
+local mm shootdown (3),260
+remote ipi send (4),71
+remote shootdown (1),75

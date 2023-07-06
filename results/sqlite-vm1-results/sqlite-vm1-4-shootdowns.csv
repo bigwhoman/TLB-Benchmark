@@ -1,0 +1,5 @@
+reason,occurrence
+local mm shootdown (3),9
+remote ipi send (4),4
+remote shootdown (1),4
+flush on task switch (0),7
