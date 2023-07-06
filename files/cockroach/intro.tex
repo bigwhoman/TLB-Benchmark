@@ -82,7 +82,7 @@ node استفاده کنیم.
 های کلاستر، داده‌های تست را لود کنیم و دیتابیس را بسازیم.
 \\
 \codebox{
-  docker exec -it cockroach\_roach1\_1 ./cockroach workload fixtures import tpcc --warehouses=10 'postgresql://root@roach1:26257?sslmode=disable'
+  cockroach workload fixtures import tpcc --warehouses=10 'postgresql://localhost:26257?sslmode=disable'
 }
 \begin{figure}[H]
   \centering
@@ -92,5 +92,5 @@ node استفاده کنیم.
 سپس تست را با دستور زیر شروع می‌کنیم.
 این تست به مدت ۱۰ دقیقه اجرا می‌شود.
 \codebox{
-  perf record -o ./benchmark/cockroach-benchmark-tpcc-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults docker exec -it cockroach\_roach1\_1 cockroach workload run tpcc --warehouses=10 --ramp=3m --duration=10m 'postgresql://root@roach1:26257?sslmode=disable'
+  perf record -o ./benchmark/cockroach-benchmark-tpcc-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cockroach workload run tpcc --warehouses=10 --ramp=3m --duration=10m 'postgresql://localhost:26257?sslmode=disable'
 }
