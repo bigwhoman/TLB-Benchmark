@@ -44,7 +44,3 @@ for ((i=1;i<=$num_nodes;i++)); do
     echo "Node cassandra_node_$i is up"
   fi
 done
-
-#echo Starting Tests
-
-sudo bash benchmark.sh

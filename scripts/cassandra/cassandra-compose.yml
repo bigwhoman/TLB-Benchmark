@@ -18,15 +18,6 @@ services:
     ports:
       - '7002:7000'
       - '9042:9042'
-  cassandra_node_3:
-    extends:
-      file: cassandra-compose.base.yml
-      service: cassandra_node_template
-    environment:
-      - CASSANDRA_SEEDS=cassandra_node_1
-    ports:
-      - '7003:7000'
-      - '9043:9042'
 networks:
   cassandra_net:
     driver: bridge
