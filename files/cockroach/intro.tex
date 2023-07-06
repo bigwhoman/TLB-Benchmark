@@ -92,5 +92,5 @@ node استفاده کنیم.
 سپس تست را با دستور زیر شروع می‌کنیم.
 این تست به مدت ۱۰ دقیقه اجرا می‌شود.
 \codebox{
-  perf record -o ./benchmark/cockroach-benchmark-tpcc-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cockroach workload run tpcc --warehouses=10 --ramp=3m --duration=10m 'postgresql://localhost:26257?sslmode=disable'
+  sudo perf record -p \$(pidof cockroach | cut -d' ' -f2- | tr ' ' ',') -o ./benchmark/cockroach-benchmark-tpcc-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults
 }
