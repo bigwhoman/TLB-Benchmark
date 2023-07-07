@@ -23,8 +23,19 @@ def extract_tlb_flush_event(line: str) -> Union[Tuple[int, int, str], None]:
         return None
     reason = line[line.rfind(":")+1:]
     line = line.split()
-    pid = int(line[1])
-    pages = int(line[5].split(":")[1])
+    i = 0
+    if "CompilerThre" in line or "Thread#3" in line or "Thread#2" in line or "Thread#1" in line or "Thread#0" in line or "Thread" in line: 
+    	i = 1
+    if "Periodic" in line :
+    	i = 2
+    try :
+    	pid = int(line[1+i])
+    except :
+    	print(line)
+    	print(i)
+    	print("CompilerThre" in line)
+    pages = int(line[5+i].split(":")[1])
+    i = 0
     return pid, pages, reason
 
 if len(sys.argv) < 2:
