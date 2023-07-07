@@ -1,9 +1,9 @@
 duration=2m
 r_pid=$(pgrep -f redis)
-redis-benchmark >./output.txt 2>&1 &
-sudo perf record -p $r_pid -o ./benchmark/redis-benchmark-bare-metal-$(uname -r).perf -e tlb:tlb_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults &
+sudo redis-benchmark >./output.txt 2>&1 &
+sudo perf record -p $r_pid -o ./benchmark/redis-benchmark-vm-$(uname -r).perf -e tlb:tlb_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults &
 perf_id=$!
-strace -f -p "$pid" 2> ./benchmark/redis-benchmark-bare-metal-$(uname -r).strace &
+strace -f -p "$pid" 2> ./benchmark/redis-benchmark-vm-$(uname -r).strace &
 strace_id=$!
 echo $perf_id,$strace_id
 sleep $duration
@@ -19,4 +19,3 @@ if ps -p $perf_id > /dev/null; then
 fi
 
 echo "done redis test"
-

@@ -1,0 +1,28 @@
+version: '3'
+services:
+  cassandra_node_1:
+    image: cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=my_cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_SEEDS=cassandra_node_1
+    networks:
+      - cassandra_net
+    ports:
+      - '7001:7000'
+      - '9041:9042'
+  cassandra_node_2:
+    image: cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=my_cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_SEEDS=cassandra_node_1
+    networks:
+      - cassandra_net
+    ports:
+      - '7002:7000'
+      - '9042:9042'
+networks:
+  cassandra_net:
+    driver: bridge
+
