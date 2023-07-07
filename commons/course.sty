@@ -209,12 +209,6 @@ title=#2,#1}
 \newcommand{\startunderscoreletter}{\catcode`_ 12\relax}
 \newcommand{\stopunderscoreletter}{\catcode`_ 8\relax}
 
-\newcommand{\foo}[1]{%
-  \ifthenelse{\equal{#1}{dTLB-prefetch-misses}}
-    {TRUE}
-    {#1}%
-}
-
 \newcommand{\readevents}[1]{
 	\startunderscoreletter
 	\begin{latin}
@@ -286,7 +280,7 @@ title=#2,#1}
 		{% Hirbod: DO NOT FUCKING TOUCH THE %
 			\stepcounter{stracerowcounter}%
 			\ifnum\value{stracerowcounter}<10%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			\else%
 				\def\@tempa{}%
 			\fi%
@@ -299,31 +293,31 @@ title=#2,#1}
 		\csvreader[head to column names]{#1}{}
 		{% Hirbod: DO NOT FUCKING TOUCH THE %
 			\ifthenelse{\equal{\csvcoli}{mmap}}{%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			}{\def\@tempa{}}%
 			\@tempa%
 			\ifthenelse{\equal{\csvcoli}{munmap}}{%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			}{\def\@tempa{}}%
 			\@tempa%
 			\ifthenelse{\equal{\csvcoli}{msync}}{%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			}{\def\@tempa{}}%
 			\@tempa%
 			\ifthenelse{\equal{\csvcoli}{madvice}}{%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			}{\def\@tempa{}}%
 			\@tempa%
 			\ifthenelse{\equal{\csvcoli}{mprotect}}{%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			}{\def\@tempa{}}%
 			\@tempa%
 			\ifthenelse{\equal{\csvcoli}{mincore}}{%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			}{\def\@tempa{}}%
 			\@tempa%
 			\ifthenelse{\equal{\csvcoli}{malloc_mmap}}{%
-				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+				\def\@tempa{\\\hline\csvcoli & \num{\csvcolii}}%
 			}{\def\@tempa{}}%
 			\@tempa%
 		}
