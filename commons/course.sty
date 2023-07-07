@@ -1,4 +1,5 @@
 \usepackage{float}
+\usepackage[group-separator={,}]{siunitx}
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage[svgnames]{xcolor} 
@@ -22,12 +23,11 @@
 \usepackage{PTSerif} 
 \usepackage{seqsplit}
 \usepackage{changepage}
-
-
+\usepackage{csvsimple}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{sectsty}
-
+\usepackage{pgf-pie}
 \setcounter{secnumdepth}{0}
  
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -36,7 +36,7 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \definecolor{blanchedalmond}{rgb}{1.0, 0.92, 0.8}
 \definecolor{brilliantlavender}{rgb}{0.96, 0.73, 1.0}
- 
+\newcommand{\nop}[1]{}
 \NewDocumentCommand{\codeword}{v}{
 \lr{\texttt{\textcolor{blue}{#1}}}
 }
@@ -205,4 +205,131 @@ title=#2,#1}
 	
 }
 
+% https://tex.stackexchange.com/a/232188
+\newcommand{\startunderscoreletter}{\catcode`_ 12\relax}
+\newcommand{\stopunderscoreletter}{\catcode`_ 8\relax}
 
+\newcommand{\foo}[1]{%
+  \ifthenelse{\equal{#1}{dTLB-prefetch-misses}}
+    {TRUE}
+    {#1}%
+}
+
+\newcommand{\readevents}[1]{
+	\startunderscoreletter
+	\begin{latin}
+	\centering
+	\begin{table}[H]
+	\centering
+	\begin{tabular}{c|c}
+		\bfseries Event & \bfseries Occurrence
+		\csvreader[head to column names]{#1}{}
+		{\\\hline
+		\csvcoli &
+		\ifthenelse{\equal{\csvcoli}{dTLB-prefetch-misses}}{NOT SUPPORTED}{\num{\csvcolii}}
+		}
+	\end{tabular}
+	\caption{Event counters}
+	\end{table}
+	\end{latin}
+	\stopunderscoreletter
+}
+
+% https://stackoverflow.com/a/68875792
+\definecolorseries{piechartcolors}{rgb}{step}[rgb]{.95,.85,.55}{.17,.47,.37}
+\resetcolorseries{piechartcolors}
+\newcommand{\slice}[4]{
+	\pgfmathsetmacro{\midangle}{0.5*#1+0.5*#2}
+	\begin{scope}
+		\clip (0,0) -- (#1:1) arc (#1:#2:1) -- cycle;
+		\colorlet{SliceColor}{piechartcolors!!+}%
+		\fill[inner color=SliceColor!30,outer color=SliceColor!60] (0,0) circle (1cm);
+	\end{scope}
+	\draw[thick] (0,0) -- (#1:1) arc (#1:#2:1) -- cycle;
+	\node[label=\midangle:#4] at (\midangle:1) {};
+	\pgfmathsetmacro{\temp}{min((#2-#1-10)/110*(-0.3),0)}
+	\pgfmathsetmacro{\innerpos}{max(\temp,-0.5) + 0.8}
+	\node at (\midangle:\innerpos) {#3};
+}
+\newcommand{\readreasonpie}[1] {
+	\begin{latin}
+	\centering
+	\csvreader[before reading=\def\mysum{0}]{#1}{occurrence=\occurrence}{%
+		\pgfmathsetmacro{\mysum}{\mysum+\occurrence}%
+	}
+	\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=2]%
+	\def\mya{0}\def\myb{0}
+	\csvreader[head to column names]{#1}{}{%
+		\let\mya\myb
+		\pgfmathsetmacro{\myb}{\myb+\occurrence}
+		\slice{\mya/\mysum*360}{\myb/\mysum*360}{\occurrence}{\reason}
+	}
+	\end{tikzpicture}
+	\caption{TLB shootdown reasons}
+	\end{figure}
+	\end{latin}
+}
+
+\newcounter{stracerowcounter}
+\newcommand{\readstrace}[1]{
+	\startunderscoreletter
+	\begin{latin}
+	% Table for top usage
+	\begin{table}[H]
+	\centering
+	\setcounter{stracerowcounter}{0}
+	\begin{tabular}{c|c}
+		\bfseries Syscall & \bfseries Usage
+		\csvreader[head to column names]{#1}{}
+		{% Hirbod: DO NOT FUCKING TOUCH THE %
+			\stepcounter{stracerowcounter}%
+			\ifnum\value{stracerowcounter}<10%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			\else%
+				\def\@tempa{}%
+			\fi%
+			\@tempa%
+		}
+	\end{tabular}
+	\qquad
+	\begin{tabular}{c|c}
+		\bfseries Desired Syscall & \bfseries Usage
+		\csvreader[head to column names]{#1}{}
+		{% Hirbod: DO NOT FUCKING TOUCH THE %
+			\ifthenelse{\equal{\csvcoli}{mmap}}{%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			}{\def\@tempa{}}%
+			\@tempa%
+			\ifthenelse{\equal{\csvcoli}{munmap}}{%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			}{\def\@tempa{}}%
+			\@tempa%
+			\ifthenelse{\equal{\csvcoli}{msync}}{%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			}{\def\@tempa{}}%
+			\@tempa%
+			\ifthenelse{\equal{\csvcoli}{madvice}}{%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			}{\def\@tempa{}}%
+			\@tempa%
+			\ifthenelse{\equal{\csvcoli}{mprotect}}{%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			}{\def\@tempa{}}%
+			\@tempa%
+			\ifthenelse{\equal{\csvcoli}{mincore}}{%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			}{\def\@tempa{}}%
+			\@tempa%
+			\ifthenelse{\equal{\csvcoli}{malloc_mmap}}{%
+				\def\@tempa{\\\hline\csvcoli & \csvcolii}%
+			}{\def\@tempa{}}%
+			\@tempa%
+		}
+	\end{tabular}
+	\caption{Top and desired syscalls}
+	\end{table}
+	\end{latin}
+	\stopunderscoreletter
+}
