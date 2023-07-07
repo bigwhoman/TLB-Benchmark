@@ -1,0 +1,8 @@
+event,occurrence
+dTLB-loads,22705387708
+dTLB-load-misses,278654548
+iTLB-load-misses,421683838
+dTLB-prefetch-misses,0
+cache-misses,2449933909
+page-faults,28082
+tlb:tlb_flush,17839
