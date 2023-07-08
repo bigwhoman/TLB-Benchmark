@@ -281,8 +281,10 @@ title=#2,#1}
 		xtick=data,
 		 nodes near coords, % this command is used to mention the y-axis points on the top of the particular bar.
 		nodes near coords align={vertical},
-		width=0.8\textwidth,
-		height=0.5\textwidth
+		width=0.9\textwidth,
+		height=0.5\textwidth,
+		label style={font=\normalsize},
+		tick label style={font=\small}
 	]
 	\addplot table [x=reason, y=occurrence, col sep=comma] {#1};
 	\end{axis}
