@@ -1,5 +1,5 @@
 # Load 2 gigabytes of mock data
-
+sudo docker exec -it cockroach_roach1_1 ./cockroach --host=roach1:26357 init --insecure
 warehouses=10
 sudo cockroach workload fixtures import tpcc --warehouses=$warehouses 'postgresql://localhost:26257?sslmode=disable'
 sudo cockroach workload run tpcc --warehouses=10 --ramp=3m --duration=10m 'postgresql://localhost:26257?sslmode=disable' >./output.txt 2>&1 &
