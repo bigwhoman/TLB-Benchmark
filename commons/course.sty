@@ -28,6 +28,7 @@
 \usepackage{xcolor}
 \usepackage{sectsty}
 \usepackage{pgf-pie}
+\usepackage{pgfplots}
 \setcounter{secnumdepth}{0}
  
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -263,6 +264,32 @@ title=#2,#1}
 	\end{tikzpicture}
 	\caption{TLB shootdown reasons}
 	\end{figure}
+	\end{latin}
+}
+
+\newcommand{\readreasonbar}[1]{
+	\begin{latin}
+	\begin{center}
+	\begin{tikzpicture}
+	\begin{axis}
+	[
+		ybar,
+		enlargelimits=0.15,
+		ylabel={\#Occurrence}, % the ylabel must precede a # symbol.
+		xlabel={},
+		symbolic x coords={flush on task switch (0), remote shootdown (1), local mm shootdown (3), remote ipi send (4)}, % these are the specification of coordinates on the x-axis.
+		xtick=data,
+		 nodes near coords, % this command is used to mention the y-axis points on the top of the particular bar.
+		nodes near coords align={vertical},
+		width=0.9\textwidth,
+		height=0.5\textwidth,
+		label style={font=\normalsize},
+		tick label style={font=\small}
+	]
+	\addplot table [x=reason, y=occurrence, col sep=comma] {#1};
+	\end{axis}
+	\end{tikzpicture}
+	\end{center}
 	\end{latin}
 }
 
