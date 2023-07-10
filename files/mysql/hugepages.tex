@@ -7,4 +7,80 @@
 \lr{huge pages}
 استفاده بکند.
 
-TODO
+برای اینکار با توجه به
+\link{https://dev.mysql.com/doc/refman/8.0/en/large-page-support.html}{داکیومنشن}
+خود
+\lr{MySQL}
+در فایل کانفیگ
+\lr{MySQL}
+خط زیر را در زیر
+\codeword{[mysqld]}
+اضافه کردم.
+\codebox{large-pages=ON}
+بعد از ری‌استارت سیستم عامل و
+\lr{MySQL}
+دستور زیر را زدم و نتیجه زیرش آمد:
+\codebox{\$ grep $\string^$Huge /proc/meminfo\\
+HugePages\_Total:     500\\
+HugePages\_Free:      500\\
+HugePages\_Rsvd:        0\\
+HugePages\_Surp:        0\\
+Hugepagesize:       2048 kB\\
+Hugetlb:         1024000 kB}
+یعنی اصلا
+\lr{MySQL} از \lr{huge pages}
+استفاده نمی‌کرد. برای همین موضوع کمی در اینترنت سرچ کردم و به
+\link{https://stackoverflow.com/q/29457769/4213397}{این}
+سوال رسیدم. این سوال نوشته بود که لازم است که دستی خود گروه
+\lr{mysql}
+را به گروه‌هایی که اجازه‌ی استفاده از
+\lr{huge pages}
+را داشتند را بدهیم.
+\emph{کاری که در PostgreSQL نیازی نبود!}
+با این حال به کمک
+\codeword{id -g mysql}
+شماره گروه
+\lr{mysql}
+را در آوردم
+(که 135 بود)
+و خط زیر را به فایل
+\codeword{/etc/sysctl.conf}
+اضافه کردم.
+\codebox{vm.hugetlb\_shm\_group = 135}
+سپس کامپیوتر را ری استارت کردم. ولی باز هم مشکل رفع نشد! سپس قطعه کدی که مربوط به فایل
+\codeword{/etc/security/limits.conf}
+بود را نیز به آن فایل اضافه کردم ولی تاثیری نداشت. سپس شروع به نگاه کردن لاگ‌های
+\lr{MySQL}
+کردم و خط زیر را در آن دیدم:
+\codebox{[Warning] [MY-012681] [InnoDB] large\_page\_aligned\_alloc mmap(138412032 bytes) failed; errno 13}
+در ابتدا سعی کردم که بفهمم که منشا این کد کجاست. بعد از صرفا سرچ کردن اسم
+\lr{large page aligned alloc}
+به
+\link{https://dev.mysql.com/doc/dev/mysql-server/latest/large__page__alloc-linux_8h_source.html}{این}
+لینک از سورس کد
+\lr{MySQL}
+رسیدم. در این کد صرفا به کمک تابع
+\lr{mmap}
+مموری را
+\lr{allocate}
+می‌کنیم. همچنین با یک سرچ دیگر فهمیدم که
+\codeword{errno 13} به \codeword{EACCES}
+بر می‌گشت. با توجه به
+\lr{man page}ها
+می‌توان تعبیر زیر را برای این ارور داشت:
+\begin{latin}
+\begin{quote}
+    A file descriptor refers to a non-regular file.  Or a file  mapping  was  requested,  but  fd  is  not  open  for  reading.  Or MAP\_SHARED was requested and PROT\_WRITE is set, but  fd  is  not open in read/write (O\_RDWR) mode.  Or PROT\_WRITE is set, but the file is append-only.
+\end{quote}
+\end{latin}
+این ارور حقیقتا هیچ کمکی به ما نکرد. من خود تکه کد تابع خود
+\lr{MySQL}
+را در برنامه‌ی خیلی کوچکی انداختم که صرفا تست کنم آیا کار می‌کند یا خیر و با کمال تعجب کار کرد!
+در انتها نیز من به جای یک گیگ
+\lr{huge pages}
+10 گیگ
+\lr{huge pages}
+\lr{allocate}
+کردم ولی این نیز تاثیری نداشت. پس صرفا از تست کردن
+\lr{huge pages}
+منصرف شدیم.
