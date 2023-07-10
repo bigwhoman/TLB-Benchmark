@@ -1,8 +1,8 @@
 event,occurrence
-dTLB-loads,0
-dTLB-load-misses,0
-iTLB-load-misses,0
+dTLB-loads,69254502460
+dTLB-load-misses,101776699
+iTLB-load-misses,70641635
 dTLB-prefetch-misses,0
-cache-misses,0
-page-faults,0
-tlb:tlb_flush,0
+cache-misses,393905544
+page-faults,549
+tlb:tlb_flush,1
