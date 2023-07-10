@@ -221,7 +221,7 @@ title=#2,#1}
 		\csvreader[head to column names]{#1}{}
 		{\\\hline
 		\csvcoli &
-		\ifthenelse{\equal{\csvcoli}{dTLB-prefetch-misses}}{NOT SUPPORTED}{\num{\csvcolii}}
+		\ifthenelse{\equal{\csvcolii}{0}}{NOT SUPPORTED}{\num{\csvcolii}}
 		}
 	\end{tabular}
 	\caption{Event counters}

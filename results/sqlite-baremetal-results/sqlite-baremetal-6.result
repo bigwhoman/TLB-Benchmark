@@ -1,0 +1,6 @@
+Reader thread 139699697346304 finished with 111 iterations.
+Reader thread 139699688953600 finished with 201 iterations.
+Writer thread 139699680560896 finished with 41 iterations.
+Writer thread 139699672168192 finished with 141 iterations.
+Mixed thread 139699663775488 finished with 113 reads and 112 writes.
+Mixed thread 139699314226944 finished with 204 reads and 217 writes.

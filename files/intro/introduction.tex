@@ -82,6 +82,29 @@
     \caption{\lr{KVM service}}
     \label{fig:into:kvm}
 \end{figure}
+یک نکته‌ای که وجود دارد این است به صورت پیش‌فرض
+\lr{KVM} از \link{https://en.wikipedia.org/wiki/Qcow}{qcow2}
+استفاده می‌کند که یک نوع فایل
+\lr{thin provisioned}
+برای ذخیره سازی داده‌های یک ماشین مجازی هست. ولی از آنجا که کار ما
+\lr{IO intensive}
+است، بهتر است که از
+\lr{thin provisioning}
+استفاده نکنیم. به همین منظور باید دیسک مجازی را به حالت
+\lr{raw}
+در بیاوریم. برای این کار ما از
+\link{https://easyengine.io/tutorials/kvm/convert-qcow2-to-raw-format/}{این}
+مراحل استفاده کردیم. یعنی کافی است که در ابتدا دستور زیر را در ترمیال بزنیم که دیسک تبدیل به نسخه‌ی
+\lr{raw}
+شود.
+\codebox{qemu-img convert vm.qcow2 vm.raw}
+سپس به کمک دستور
+\codeword{virsh edit vm1}
+تنظیمات ماشین مجازی را می‌توان عوض کرد. کافی است که قسمت
+\codeword{disk}
+را پیدا کنیم و هم نوع آنرا از
+\lr{qcow2} به \lr{raw}
+و هم مسیر آنرا آپدیت کنیم.
 
 \subsection{کامپایل کرنل}
 در این آزمایش ما تصمیم گرفتیم که کرنل‌های
