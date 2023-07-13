@@ -69,3 +69,50 @@ Mixed thread 140136948504320 finished with 65 reads and 63 writes.
 Writer thread 140569238087424 finished with 80 iterations.\\
 Mixed thread 140569112213248 finished with 55 reads and 41 writes.
 }
+\subsection{تحلیل}
+یکی دیگر از چیز‌هایی که به چشممان آمد این بود که باز هم از
+\codeword{mprotect}
+استفاده شده بود. از آنجا که کلا سورس کد
+\lr{SQlite}
+یک فایل است، پس می‌توانستم به سادگی در آن سرچ کنم که کجا
+\codeword{mprotect}
+استفاده شده است. اما قبل از آن در شکل
+\ref{fig:sqlite3:results:mprotect}
+بررسی کردم که روند اجرای برنامه دقیقا چیست و کجا
+\codeword{mprotect}
+اجرا می‌شود. همان طور که مشاهده می‌شود در یک ترد و دقیقا بعد از اجرای
+\codeword{pread64} یک دستور \codeword{mprotect}
+نیز زده می‌شود.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{pictures/sqlite3/results/mprotect.png}
+    \caption{\lr{mprotect} در روند اجرای برنامه}
+    \label{fig:sqlite3:results:mprotect}
+\end{figure}
+اما یک نکته‌ی عجیبی وجود داشت. هیچ‌گاه
+\codeword{mprotect}
+در سورس کد
+\lr{sqlite}
+صدا زده نمی‌شد!
+(شکل \ref{fig:sqlite3:results:mprotect2})
+این موضوع ما را به این فرضیه صوق داد که احتمالا این موضوع تقصیر
+\codeword{malloc}
+است. زمانی که برای بار اول
+\codeword{malloc}
+صدا زده می‌شود، به جای اینکه یک فضای کمی از حافظه هر بار از سیستم عامل درخواست شود، یک فضای بزرگ
+از مموری از سیستم عامل درخواست می‌شود که تمام آن فضا غیر قابل نوشتن و خواندن است.
+زمانی که
+\codeword{malloc}
+صدا زده می‌شود، هر بار بخشی از حافظه به کمک
+\codeword{mprotect}
+قابل خواندن و نوشتن می‌شود. این موضوع نشان می‌دهد که چرا هم در
+\lr{MySQL} و هم \lr{SQlite}
+این رفتار که چند دستور
+\codeword{mprotect} \lr{batch}
+نمی‌شدند را شاهد بودیم.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{pictures/sqlite3/results/mprotect2.png}
+    \caption{وجود نداشتن \lr{mprotect} در سورس کد sqlite}
+    \label{fig:sqlite3:results:mprotect2}
+\end{figure}
