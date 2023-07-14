@@ -16,6 +16,9 @@ containrize
 داکیومنتیشن نصب می‌کنیم و سپس 
 برای نصب ردیس، از قطعه کد زیر استفاده می‌کنیم که 
 ردیس را نصب می‌کند و پورت ۶۳۷۹ آنرا، به پورت ۶۳۷۹ کامپیوتر بایند می‌کند.
+\\
+برای بنچ‌مارک از ردیس \textbf{ورژن ۷} که در حال حاضر (۲۰۲۳) 
+جدیدترین ورژن است استفاده می‌کنیم.
 \begin{latin}
   \begin{verbatim}
     version: '3.7'
@@ -26,19 +29,30 @@ containrize
           - 6379:6379    
   \end{verbatim}
 \end{latin}
+\noindent
 برای بنچ‌مارک ردیس از ابزار درونی خود ردیس استفاده می‌کنیم که همان 
 \textbf{redis-benchmark}
 است.
 \\
-این ابزار در چندین سناریوی ازپیش‌ تعریف‌‌شده دیتابیس گفته‌شده را تست می‌کند و همچنین می‌توان تعداد کاربران و نیز
+این ابزار در 13 سناریوی ازپیش‌ تعریف‌‌شده دیتابیس گفته‌شده را تست می‌کند و همچنین می‌توان تعداد کاربران و نیز
 تراکنش‌های موازی آنرا تعیین کرد.
 \\
+اطلاعات تراکنش‌ها به شرح زیر است :‌
+\begin{enumerate}
+    \item \lr{100000 Requests}
+    \item \lr{50 Parallel Connections}
+\end{enumerate}
+نکته این است که برای اینکه ابزار بنچ‌مارک تاثیری در پراسس‌های داکر نگذارد و اینکه نتایج دقیق‌تر شوند خود ردیس را به صورت فایل نصبی دانلود می‌کنیم و پردازه داکر را با آن تست می‌کنیم.
 برای تست کردن و جمع‌آوری دیتا از اسکریپت زیر استفاده می‌کنیم.
+قطعه کد زیر به شماره پردازه redis عملا attach می‌شود و از گرفتن اطلاعات اضافه نیز جلوگیری می‌کند.
 \begin{latin}
   \codebox{
-  sudo perf record -o ./benchmark/redis-benchmark-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults redis-benchmark
-  \\
-  strace redis-benchmark 2> ./benchmark/redis-benchmark-bare-metal-\$(uname -r).strace 
+    r\_pid=\$(pgrep -f redis)
+    \\
+    sudo perf record -p \$r\_pid -o ./benchmark/redis-benchmark-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults
+}
+\codebox{
+    strace -f -p "\$r\_pid" 2> ./benchmark/redis-benchmark-bare-metal-\$(uname -r).strace 
 }
 \end{latin}
 \noindent

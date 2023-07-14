@@ -10,6 +10,10 @@ image
 خواسته شده، موجود نباشد، خود داکر کامپوز آنرا
 pull 
 می‌کند.\\
+برای این بنچ‌مارک از \textbf{ورژن ۴} 
+cassandra
+استفاده می‌کنیم.
+\\
 دلیل استفاده از داکر این بود که می‌توانستیم نحوه کارکرد 
 seed 
 های 
@@ -35,12 +39,12 @@ node
         driver: bridge
   \end{verbatim}
 \end{latin}
-
+\noindent
 حال این ایمیج برای ساختن یک عدد 
 container 
 استفاده می‌شود.
 \\
-برای ساخت کلیه موارد مورد نظر، از اسکریپت create\_nodes استفاده می‌کنیم که عملا تعداد seed های مورد نظر را 
+برای ساخت کلیه موارد مورد نظر، از اسکریپت create\_nodes استفاده می‌کنیم که عملا تعداد node های مورد نظر را 
 گرفته و به تعداد آنان، کانتینر حاوی 
 cassandra 
 ایجاد کرده، 
@@ -51,10 +55,10 @@ cluster
 \\
 \textbf{نکته مهم : } 
 به علت عدم وجود حافظه کافی و اینکه هر کدام از 
-seed 
+node 
 های کاساندرا مقدار زیادی منبع مصرف می‌کنند، نتوانستم بیش از ۳ 
 node 
-همزمان را بالا بیاورم پس مجبور شدم برای جلوگیری از کاهش عملکرد، صرفا به ۲ seed 
+همزمان را بالا بیاورم پس مجبور شدم برای جلوگیری از کاهش عملکرد، صرفا به ۲ node 
 اکتفا کنم.
 \\
 حال پس از بالا آمدن node 
@@ -63,29 +67,43 @@ node
 موجود در tools 
 همراه برنامه استفاده می‌کنیم.
 \\
-متاسفانه این برنامه در کانتینرها و کلا docker image 
+متاسفانه این برنامه در کانتینرها و کلا \lr{docker image} 
 خود کاساندرا موجود نبود و مجبور شدم به صورت جداگانه کاساندرا را در کامپیوتر نصب کنم تا بتوانم از این ابزار استفاده کنم.\\
 حال از اسکریپت benchmark.sh 
-برای بنچ‌مارک با کمک کاساندرا استفاده می‌کنیم.
+برای بنچ‌مارک با کمک کاساندرا استفاده می‌کنیم اما به دلیل قدیمی بودن ابزار بنچ‌مارک، این ابزار را کمی تغییر می‌دهیم که تست‌های به روز را که توسط 
+community 
+تایید شده‌اند را استفاده کند.
 برای این کار اسکریپت زیر را درنظر بگیرید.
 \codebox{
-
-sudo perf record -o ./benchmark/cassandra-benchmark-3-7-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50
+pids=\$(pgrep -f cassandra | paste -s -d,)
 \\
-strace cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50 2> ./benchmark/cassandra-benchmark-3-7-bare-metal-\$(uname -r).strace 
+cassandra-stress mixed ratio( write=a,read=b ) duration=\$duration -rate threads=50 >./output-a-b.txt
 \\
-
-sudo perf record -o ./benchmark/cassandra-benchmark-5-5-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50
-\\
-strace cassandra-stress mixed ratio(write=5,read=5) n=1000000 -rate threads=50 2> ./benchmark/cassandra-benchmark-5-5-bare-metal-\$(uname -r).strace 
-\\
-
-sudo perf record -o ./benchmark/cassandra-benchmark-7-3-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults cassandra-stress mixed ratio(write=3,read=7) n=1000000 -rate threads=50
-\\
-strace cassandra-stress mixed ratio(write=7,read=3) n=1000000 -rate threads=50 2> ./benchmark/cassandra-benchmark-7-3-bare-metal-\$(uname -r).strace 
 }
-این اسکریپت عملا در ۳ سناریو، یک میلیون تا عملیات را برروی 
-seed 
+\codebox{
+sudo perf record -p \$pids -o ./benchmark/cassandra-benchmark-3-7-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults
+}
+\codebox{
+strace -f -p "\$pids"  2> ./benchmark/cassandra-benchmark-3-7-bare-metal-\$(uname -r).strace 
+}
+\codebox{
+sudo perf record -p \$pids -o ./benchmark/cassandra-benchmark-5-5-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults
+}
+\codebox{
+strace -f -p "\$pids" 2> ./benchmark/cassandra-benchmark-5-5-bare-metal-\$(uname -r).strace 
+}
+\codebox{
+sudo perf record -p \$pids -o ./benchmark/cassandra-benchmark-7-3-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults
+}
+\codebox{
+strace -f -p "\$pids" 2> ./benchmark/cassandra-benchmark-7-3-bare-metal-\$(uname -r).strace 
+}
+ \noindent
+این اسکریپت عملا در ۳ سناریو، 
+1000000
+عملیات
+را برروی 
+node 
 های کاساندرا انجام می‌دهد.
 \\
 گزینه mixed مشخص می‌کند که این 
@@ -97,5 +115,3 @@ threads
 این ۳ سناریو محبوب‌ترین سناریوهایی بودند که طبق گفته خود 
 کامیونیتی کاساندرا 
 غالبا در سیستم‌های توزیع‌شده استفاده می‌شوند.
-\\
-حال نتایج را در سیستم‌های مختلف بررسی می‌کنیم.

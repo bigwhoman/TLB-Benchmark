@@ -61,6 +61,12 @@ create\_cockroach\_nodes
   \end{verbatim}
 \end{latin}
 
+\noindent
+یکی از دلایلی که cockroach 
+دیتابیس توزیع شده خوبی است این است که برخلاف cassandra 
+که هر node آن مقدار
+زیادی منبع مصرف می‌کند، این دیتابیس بسیار در مصرف منابع بهینه عمل می‌کند به صورتی که تقریبا روی کانفیگ من که در ابتدای گزارش گفته شد، حدود ۱۲ node با عملکرد بسیار خوب می‌توان داشت.
+\\
 حال پس از راه‌اندازی node ها اسکریپت benchmark.sh را ران می‌کنیم که 
 تست TPC-C 
 را اجرا می‌کند.
@@ -92,5 +98,14 @@ node استفاده کنیم.
 سپس تست را با دستور زیر شروع می‌کنیم.
 این تست به مدت ۱۰ دقیقه اجرا می‌شود.
 \codebox{
+cockroach workload run tpcc --warehouses=10 --ramp=3m --duration=10m 'postgresql://localhost:26257?sslmode=disable' >./output.txt
+}
+در ادامه از کدهای زیر برای attach کردن perf, strace به پردازه‌ها استفاده می‌کنیم.
+\codebox{
   sudo perf record -p \$(pidof cockroach | cut -d' ' -f2- | tr ' ' ',') -o ./benchmark/cockroach-benchmark-tpcc-bare-metal-\$(uname -r).perf -e tlb:tlb\_flush,dTLB-loads,dTLB-load-misses,iTLB-load-misses,cache-misses,page-faults
 }
+\codebox{
+ strace -f -p "\$(pidof cockroach | cut -d' ' -f2- | tr ' ' ',')" 2> ./benchmark/cockroach-benchmark-tpcc-bare-metal-\$(uname -r).strace
+}
+
+نتایج کلی مانند دو دیتابیس قبلی یعنی ردیس و کاساندرا است و دلیل هم مانند دو سیستم قبلی عدم وجود منابع کافی برای ماشین مجازی است.
